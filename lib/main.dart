@@ -11,11 +11,13 @@ import 'package:provider/provider.dart';
 import 'package:safesecurelibs/safesecurelibs.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
+import 'package:civic_service_app/providers/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  
 
   runApp(
     MultiProvider(
@@ -23,19 +25,39 @@ void main() async {
         ChangeNotifierProvider(create: (context) => AuthViewModel()),
         ChangeNotifierProvider(create: (context) => RegisterUserViewModel()),
         ChangeNotifierProvider(create: (context) => ComplaintViewModel()),
+        ChangeNotifierProvider(
+          create: (context) => LanguageProvider(),
+        ), // Add LanguageProvider
       ],
-      // child: MaterialApp(
-      //   debugShowCheckedModeBanner: false,
-      //   theme: AppTheme.lightTheme,
-      //   home: const SecurityCheckPage(),
-      // ),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: const AppLanding(),
-      ),
+      child: const MyApp(),
     ),
   );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          locale: languageProvider.locale,
+          supportedLocales: const [Locale('en'), Locale('hi'), Locale('bn')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          // home: const SecurityCheckPage(),
+          home: AppLanding(),
+        );
+      },
+    );
+  }
 }
 
 class SecurityCheckPage extends StatefulWidget {
@@ -65,7 +87,7 @@ class _SecurityCheckPageState extends State<SecurityCheckPage> {
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => AppLanding()),
+          MaterialPageRoute(builder: (_) => const AppLanding()),
         );
       }
     } catch (e) {
@@ -79,9 +101,9 @@ class _SecurityCheckPageState extends State<SecurityCheckPage> {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        title: const Text('Security Alert'),
-        content: const Text(
-          'Developer options are enabled or device is rooted/jailbroken. Please disable them to continue.',
+        title: Text(AppLocalizations.of(context)!.translate('security_alert')),
+        content: Text(
+          AppLocalizations.of(context)!.translate('security_alert_message'),
         ),
         actions: [
           TextButton(
@@ -92,7 +114,7 @@ class _SecurityCheckPageState extends State<SecurityCheckPage> {
                 exit(0);
               }
             },
-            child: const Text('Exit'),
+            child: Text(AppLocalizations.of(context)!.translate('exit')),
           ),
         ],
       ),
@@ -101,6 +123,17 @@ class _SecurityCheckPageState extends State<SecurityCheckPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 20),
+            Text(AppLocalizations.of(context)!.translate('checking_security')),
+          ],
+        ),
+      ),
+    );
   }
 }

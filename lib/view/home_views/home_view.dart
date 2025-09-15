@@ -2,6 +2,7 @@ import 'package:civic_service_app/widgets/header/header.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -57,7 +58,9 @@ class _HomeViewState extends State<HomeView> {
                 padding: const EdgeInsets.all(16.0),
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search for "ekyc"',
+                    hintText: AppLocalizations.of(
+                      context,
+                    )!.translate('search_for_ekyc'),
                     prefixIcon: const Icon(Icons.search),
                     filled: true,
                     fillColor: Colors.white,
@@ -77,7 +80,7 @@ class _HomeViewState extends State<HomeView> {
                 options: CarouselOptions(
                   autoPlayAnimationDuration: Duration(seconds: 2),
                   height: 200,
-                  autoPlay: true, 
+                  autoPlay: true,
                   enlargeCenterPage: false,
                   viewportFraction: 0.85,
                   aspectRatio: 16 / 9,
@@ -170,8 +173,10 @@ class _HomeViewState extends State<HomeView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Progress for your last complaint',
+                        Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.translate('progress_for_your_last_complaint'),
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -181,7 +186,7 @@ class _HomeViewState extends State<HomeView> {
 
                         LinearPercentIndicator(
                           lineHeight: 50.0,
-                          percent: 0.67, 
+                          percent: 0.67,
                           animation: true,
                           animationDuration: 1200,
                           barRadius: const Radius.circular(12),
@@ -189,8 +194,10 @@ class _HomeViewState extends State<HomeView> {
                           linearGradient: LinearGradient(
                             colors: [Colors.amber, Colors.yellow],
                           ),
-                          center: const Text(
-                            "2/3 completed",
+                          center: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.translate('x_completed', ['2', '3']),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -205,17 +212,24 @@ class _HomeViewState extends State<HomeView> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildSummaryItem(
-                              'Pending',
+                              AppLocalizations.of(
+                                context,
+                              )!.translate('pending'),
                               '3',
                               colorScheme.tertiary,
                             ),
                             _buildSummaryItem(
-                              'Completed',
+                              AppLocalizations.of(
+                                context,
+                              )!.translate('completed'),
                               '2',
                               colorScheme.primary,
                             ),
+
                             _buildSummaryItem(
-                              'Compelted',
+                              AppLocalizations.of(
+                                context,
+                              )!.translate('completed'),
                               '1',
                               colorScheme.primary,
                             ),
@@ -237,9 +251,7 @@ class _HomeViewState extends State<HomeView> {
                         scrollDirection: Axis.horizontal,
                         itemCount: 8,
                         itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.all(
-                            4,
-                          ), 
+                          padding: const EdgeInsets.all(4),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -215,6 +217,8 @@ class ComplaintViewModel with ChangeNotifier {
         'imageUrl': imageUrl,
         'voiceUrl': voiceUrl,
         'status': 'Submitted',
+        'transcribe':'',
+        'translate':''
       };
 
       await _firestore

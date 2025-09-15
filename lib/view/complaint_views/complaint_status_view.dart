@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class ComplaintStatusView extends StatefulWidget {
   const ComplaintStatusView({super.key});
@@ -46,6 +47,19 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
         return 1.0;
       default:
         return 0.0;
+    }
+  }
+
+  String _getTranslatedStatus(String status) {
+    switch (status) {
+      case "Submitted":
+        return AppLocalizations.of(context)!.translate('submitted');
+      case "Progress":
+        return AppLocalizations.of(context)!.translate('progress');
+      case "Resolved":
+        return AppLocalizations.of(context)!.translate('resolved');
+      default:
+        return status;
     }
   }
 
@@ -104,7 +118,7 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
               Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: Text(
-                  'Track Complaints',
+                  AppLocalizations.of(context)!.translate('track_complaints'),
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
@@ -120,6 +134,7 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                   itemBuilder: (context, index) {
                     final complaint = complaints[index];
                     final status = complaint["status"] ?? "Submitted";
+                    final translatedStatus = _getTranslatedStatus(status);
                     final percent = _getProgressPercent(status);
 
                     final hasImage =
@@ -169,7 +184,10 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                             progressColor: _getProgressColor(status),
                             barRadius: const Radius.circular(12),
                             center: Text(
-                              "${(percent * 100).toStringAsFixed(0)}% completed",
+                              AppLocalizations.of(context)!.translate(
+                                'x_percent_completed',
+                                [((percent * 100).toStringAsFixed(0))],
+                              ),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
@@ -181,7 +199,7 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "ID: ${complaint["complaintId"] != null ? (complaint["complaintId"] as String).substring(0, complaint["complaintId"].length > 15 ? 15 : complaint["complaintId"].length) : 'N/A'}...",
+                                "${AppLocalizations.of(context)!.translate('id')}: ${complaint["complaintId"] != null ? (complaint["complaintId"] as String).substring(0, complaint["complaintId"].length > 15 ? 15 : complaint["complaintId"].length) : 'N/A'}...",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
@@ -189,7 +207,7 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                               ),
 
                               Text(
-                                "Status: $status",
+                                "${AppLocalizations.of(context)!.translate('status')}: $translatedStatus",
                                 style: TextStyle(
                                   color: _getProgressColor(status),
                                   fontWeight: FontWeight.w600,
@@ -198,7 +216,9 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Text("Registered on: $formattedDate"),
+                          Text(
+                            "${AppLocalizations.of(context)!.translate('registered_on')}: $formattedDate",
+                          ),
                           const Divider(height: 24),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
@@ -216,20 +236,28 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                                             8,
                                           ),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.photo,
                                               color: Colors.orange,
                                             ),
-                                            SizedBox(width: 6),
-                                            Text("Photo Attached"),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.translate('photo_attached'),
+                                            ),
                                           ],
                                         ),
                                       )
-                                    : const Text(
-                                        "No photo attached",
-                                        style: TextStyle(color: Colors.grey),
+                                    : Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.translate('no_photo_attached'),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                 const SizedBox(width: 16),
                                 hasVoice
@@ -244,20 +272,30 @@ class _ComplaintStatusViewState extends State<ComplaintStatusView> {
                                             8,
                                           ),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.audiotrack,
                                               color: Colors.blue,
                                             ),
-                                            SizedBox(width: 6),
-                                            Text("Voice Note Attached"),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.translate(
+                                                'voice_note_attached',
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       )
-                                    : const Text(
-                                        "No voice attached",
-                                        style: TextStyle(color: Colors.grey),
+                                    : Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.translate('no_voice_attached'),
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
                                       ),
                               ],
                             ),

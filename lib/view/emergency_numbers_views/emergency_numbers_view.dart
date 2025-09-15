@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class EmergencyNumbersView extends StatelessWidget {
   const EmergencyNumbersView({super.key});
@@ -15,9 +16,10 @@ class EmergencyNumbersView extends StatelessWidget {
 
   Widget _buildEmergencyButton({
     required IconData icon,
-    required String label,
+    required String labelKey,
     required String number,
     required Color color,
+    required BuildContext context,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -34,7 +36,7 @@ class EmergencyNumbersView extends StatelessWidget {
               Icon(icon, color: color, size: 22),
               const SizedBox(width: 8),
               Text(
-                label,
+                AppLocalizations.of(context)!.translate(labelKey),
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: color,
@@ -88,7 +90,7 @@ class EmergencyNumbersView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: Text(
-                  'Emergency Numbers',
+                  AppLocalizations.of(context)!.translate('emergency_numbers'),
                   style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
@@ -103,39 +105,45 @@ class EmergencyNumbersView extends StatelessWidget {
                   children: [
                     _buildEmergencyButton(
                       icon: Icons.local_police,
-                      label: "Police",
+                      labelKey: "police",
                       number: "100",
                       color: Colors.blue,
+                      context: context,
                     ),
                     _buildEmergencyButton(
                       icon: Icons.local_fire_department,
-                      label: "Fire",
+                      labelKey: "fire",
                       number: "101",
                       color: Colors.red,
+                      context: context,
                     ),
                     _buildEmergencyButton(
                       icon: Icons.local_hospital,
-                      label: "Ambulance",
+                      labelKey: "ambulance",
                       number: "102",
                       color: Colors.green,
+                      context: context,
                     ),
                     _buildEmergencyButton(
                       icon: Icons.emergency,
-                      label: "National Emergency",
+                      labelKey: "national_emergency",
                       number: "112",
                       color: Colors.deepPurple,
+                      context: context,
                     ),
                     _buildEmergencyButton(
                       icon: Icons.woman,
-                      label: "Women Helpline",
+                      labelKey: "women_helpline",
                       number: "1091",
                       color: Colors.orange,
+                      context: context,
                     ),
                     _buildEmergencyButton(
                       icon: Icons.child_care,
-                      label: "Child Helpline",
+                      labelKey: "child_helpline",
                       number: "1098",
                       color: Colors.pink,
+                      context: context,
                     ),
                   ],
                 ),

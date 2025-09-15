@@ -4,6 +4,7 @@ import 'package:civic_service_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class AuthenticationLanding extends StatefulWidget {
   const AuthenticationLanding({super.key});
@@ -74,7 +75,7 @@ class _AuthenticationLandingState extends State<AuthenticationLanding> {
                   children: [
                     const SizedBox(height: 10),
                     Text(
-                      "Sign Up / Login",
+                      AppLocalizations.of(context)!.translate('sign_up_login'),
                       style: TextStyle(
                         color: colorScheme.tertiary,
                         fontSize: 26,
@@ -86,7 +87,9 @@ class _AuthenticationLandingState extends State<AuthenticationLanding> {
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                        labelText: AppLocalizations.of(
+                          context,
+                        )!.translate('email'),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -97,7 +100,9 @@ class _AuthenticationLandingState extends State<AuthenticationLanding> {
                       controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        labelText: AppLocalizations.of(
+                          context,
+                        )!.translate('password'),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -117,8 +122,12 @@ class _AuthenticationLandingState extends State<AuthenticationLanding> {
                                 );
                               },
                               label: authVM.isLoading
-                                  ? "Processing..."
-                                  : "Register",
+                                  ? AppLocalizations.of(
+                                      context,
+                                    )!.translate('processing')
+                                  : AppLocalizations.of(
+                                      context,
+                                    )!.translate('register'),
                             ),
                             const SizedBox(height: 10),
                             CustomButton(
@@ -138,7 +147,13 @@ class _AuthenticationLandingState extends State<AuthenticationLanding> {
                                       });
                                     });
                               },
-                              label: authVM.isLoading ? "Checking..." : "Login",
+                              label: authVM.isLoading
+                                  ? AppLocalizations.of(
+                                      context,
+                                    )!.translate('checking')
+                                  : AppLocalizations.of(
+                                      context,
+                                    )!.translate('login'),
                             ),
                           ],
                         );

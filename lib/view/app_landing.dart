@@ -3,8 +3,8 @@ import 'package:civic_service_app/view/complaint_views/track_complaint.dart';
 import 'package:civic_service_app/view/emergency_numbers_views/emergency_numbers_view.dart';
 import 'package:civic_service_app/view/home_views/home_view.dart';
 import 'package:civic_service_app/view/profile_page_views/profile_landing.dart';
-import 'package:civic_service_app/view/profile_page_views/profile_view.dart';
 import 'package:flutter/material.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class AppLanding extends StatefulWidget {
   const AppLanding({super.key});
@@ -60,24 +60,55 @@ class _AppLandingState extends State<AppLanding> {
         child: SizedBox(
           height: 70,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildNavItem(Icons.home, "Home", 0, activeColor, inactiveColor),
-              _buildNavItem(
-                Icons.insert_chart_outlined_outlined,
-                "Complaints",
-                1,
-                activeColor,
-                inactiveColor,
+              // Left side items
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      Icons.home,
+                      "home",
+                      0,
+                      activeColor,
+                      inactiveColor,
+                    ),
+                    _buildNavItem(
+                      Icons.insert_chart_outlined_outlined,
+                      "complaints",
+                      1,
+                      activeColor,
+                      inactiveColor,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 64),
-              _buildNavItem(Icons.call, "Calls", 3, activeColor, inactiveColor),
-              _buildNavItem(
-                Icons.person_2_outlined,
-                "Profile",
-                4,
-                activeColor,
-                inactiveColor,
+
+              // Spacer for the FAB
+              const SizedBox(width: 40),
+
+              // Right side items
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      Icons.call,
+                      "calls",
+                      3,
+                      activeColor,
+                      inactiveColor,
+                    ),
+                    _buildNavItem(
+                      Icons.person_2_outlined,
+                      "profile",
+                      4,
+                      activeColor,
+                      inactiveColor,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -88,7 +119,7 @@ class _AppLandingState extends State<AppLanding> {
 
   Widget _buildNavItem(
     IconData icon,
-    String label,
+    String labelKey,
     int index,
     Color activeColor,
     Color inactiveColor,
@@ -101,7 +132,7 @@ class _AppLandingState extends State<AppLanding> {
         children: [
           Icon(icon, color: isActive ? activeColor : inactiveColor),
           Text(
-            label,
+            AppLocalizations.of(context)!.translate(labelKey),
             style: TextStyle(
               fontSize: 12,
               color: isActive ? activeColor : inactiveColor,

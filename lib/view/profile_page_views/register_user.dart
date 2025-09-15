@@ -6,6 +6,7 @@ import 'package:civic_service_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class RegisterUser extends StatefulWidget {
   const RegisterUser({super.key});
@@ -77,7 +78,7 @@ class _RegisterUserState extends State<RegisterUser> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Register User",
+                          AppLocalizations.of(context)!.translate('register_user'),
                           style: TextStyle(
                             color: colorScheme.tertiary,
                             fontSize: 28,
@@ -89,7 +90,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         TextFormField(
                           controller: fullNameController,
                           decoration: InputDecoration(
-                            labelText: 'Full Name',
+                            labelText: AppLocalizations.of(context)!.translate('full_name'),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -103,7 +104,7 @@ class _RegisterUserState extends State<RegisterUser> {
                           enabled:
                               userId == null, 
                           decoration: InputDecoration(
-                            labelText: 'Email',
+                            labelText: AppLocalizations.of(context)!.translate('email'),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -116,7 +117,7 @@ class _RegisterUserState extends State<RegisterUser> {
                           controller: phoneController,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
-                            labelText: 'Phone Number',
+                            labelText: AppLocalizations.of(context)!.translate('phone_number'),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -128,7 +129,7 @@ class _RegisterUserState extends State<RegisterUser> {
                           controller: aadhaarController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            labelText: 'Aadhaar Number',
+                            labelText: AppLocalizations.of(context)!.translate('aadhaar_number'),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -164,7 +165,7 @@ class _RegisterUserState extends State<RegisterUser> {
                                     );
                                   }
                                 },
-                                label: 'Submit',
+                                label: AppLocalizations.of(context)!.translate('submit'),
                               ),
                       ],
                     );

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:civic_service_app/view/app_landing.dart';
 import 'package:civic_service_app/viewmodel/complaint_viewmodel.dart';
@@ -9,6 +11,7 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:civic_service_app/l10n/app_localizations.dart';
 
 class AddComplaintView extends StatefulWidget {
   const AddComplaintView({super.key});
@@ -104,7 +107,7 @@ class _AddComplaintViewState extends State<AddComplaintView> {
   void _submitComplaint(BuildContext context) async {
     if (_descController.text.isEmpty || _location == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.translate('please_fill_all_required_fields'))),
       );
       return;
     }
@@ -130,7 +133,7 @@ class _AddComplaintViewState extends State<AddComplaintView> {
       ).showSnackBar(SnackBar(content: Text(viewModel.error!)));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Complaint submitted successfully!')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.translate('complaint_submitted_successfully'))),
       );
 
       Navigator.pushReplacement(
@@ -168,7 +171,7 @@ class _AddComplaintViewState extends State<AddComplaintView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Register a Complaint',
+                          AppLocalizations.of(context)!.translate('register_a_complaint'),
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
@@ -190,19 +193,19 @@ class _AddComplaintViewState extends State<AddComplaintView> {
                               ),
                             ),
                             child: _imageFile == null
-                                ? const Center(
+                                ? Center(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.camera_alt,
                                           size: 40,
                                           color: Colors.grey,
                                         ),
-                                        SizedBox(height: 8),
+                                        const SizedBox(height: 8),
                                         Text(
-                                          "Capture Image",
-                                          style: TextStyle(color: Colors.grey),
+                                          AppLocalizations.of(context)!.translate('capture_image'),
+                                          style: const TextStyle(color: Colors.grey),
                                         ),
                                       ],
                                     ),
@@ -236,7 +239,7 @@ class _AddComplaintViewState extends State<AddComplaintView> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  _location ?? "Fetching location...",
+                                  _location ?? AppLocalizations.of(context)!.translate('fetching_location'),
                                   style: const TextStyle(fontSize: 16),
                                 ),
                               ),
@@ -254,7 +257,7 @@ class _AddComplaintViewState extends State<AddComplaintView> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white.withAlpha(200),
-                            hintText: "Enter complaint description...",
+                            hintText: AppLocalizations.of(context)!.translate('enter_complaint_description'),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -278,10 +281,10 @@ class _AddComplaintViewState extends State<AddComplaintView> {
                             child: Center(
                               child: Text(
                                 _isRecording
-                                    ? "Recording... Tap to Stop"
+                                    ? AppLocalizations.of(context)!.translate('recording_tap_to_stop')
                                     : (_audioPath != null
-                                          ? "Audio Recorded ✓"
-                                          : "Record Audio (max 25s)"),
+                                          ? AppLocalizations.of(context)!.translate('audio_recorded')
+                                          : AppLocalizations.of(context)!.translate('record_audio_max_25s')),
                                 style: TextStyle(
                                   color: _isRecording
                                       ? Colors.white
@@ -310,9 +313,9 @@ class _AddComplaintViewState extends State<AddComplaintView> {
                                 ? const CircularProgressIndicator(
                                     color: Colors.white,
                                   )
-                                : const Text(
-                                    "Submit Complaint",
-                                    style: TextStyle(
+                                : Text(
+                                    AppLocalizations.of(context)!.translate('submit_complaint'),
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       color: Colors.white,
                                     ),

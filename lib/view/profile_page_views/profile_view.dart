@@ -1,3 +1,4 @@
+import 'package:civic_service_app/l10n/app_localizations.dart';
 import 'package:civic_service_app/viewmodel/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -70,7 +71,7 @@ class _ProfileViewState extends State<ProfileView> {
                 const SizedBox(height: 16),
                 Center(
                   child: Text(
-                    fullName,
+                    AppLocalizations.of(context)!.translate('user_profile'),
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -88,12 +89,22 @@ class _ProfileViewState extends State<ProfileView> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        _DetailRow(label: "Phone", value: phoneNo),
-                        const Divider(),
-                        _DetailRow(label: "Email", value: email),
-                        const Divider(),
-                        const _DetailRow(
-                          label: "Aadhar No",
+                        _DetailRow(
+                          label: AppLocalizations.of(
+                            context,
+                          )!.translate('phone'),
+                          value: phoneNo,
+                        ),
+                        _DetailRow(
+                          label: AppLocalizations.of(
+                            context,
+                          )!.translate('email'),
+                          value: email,
+                        ),
+                        _DetailRow(
+                          label: AppLocalizations.of(
+                            context,
+                          )!.translate('aadhar_no'),
                           value: "xxxxxxxxxx",
                         ),
                       ],
@@ -104,27 +115,22 @@ class _ProfileViewState extends State<ProfileView> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Badges Earned",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.secondary,
-                    ),
-                  ),
+  AppLocalizations.of(context)!.translate('badges_earned'),
+  style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: colorScheme.secondary,
+  ),
+),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 16,
                   runSpacing: 16,
                   children: [
-                    _buildBadge(
-                      Icons.emoji_events,
-                      "Top Reporter",
-                      Colors.amber,
-                    ),
-                    _buildBadge(Icons.star, "5 Complaints", Colors.blue),
-                    _buildBadge(Icons.verified, "Verified User", Colors.green),
-                  ],
+                   _buildBadge(Icons.emoji_events, AppLocalizations.of(context)!.translate('top_reporter'), Colors.amber),
+_buildBadge(Icons.star, AppLocalizations.of(context)!.translate('x_complaints', ['5']), Colors.blue),
+_buildBadge(Icons.verified, AppLocalizations.of(context)!.translate('verified_user'), Colors.green),],
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
@@ -139,7 +145,7 @@ class _ProfileViewState extends State<ProfileView> {
                       if (mounted) setState(() {});
                     },
                     icon: const Icon(Icons.logout_outlined),
-                    label: const Text("Logout"),
+                    label:  Text(AppLocalizations.of(context)!.translate('logout')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                       foregroundColor: Colors.white,
