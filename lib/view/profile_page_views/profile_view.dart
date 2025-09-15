@@ -1,5 +1,6 @@
 import 'package:civic_service_app/l10n/app_localizations.dart';
 import 'package:civic_service_app/viewmodel/auth_view_model.dart';
+import 'package:civic_service_app/viewmodel/user_viewmodel.dart'; // Import the user viewmodel
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,7 @@ class _ProfileViewState extends State<ProfileView> {
   String fullName = '';
   String phoneNo = '';
   String email = '';
+  String aadhaarNo = '';
 
   @override
   void initState() {
@@ -23,14 +25,36 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _loadUserData() async {
+    // First load from SharedPreferences as fallback
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       fullName = prefs.getString('fullName') ?? 'John Doe';
       phoneNo = prefs.getString('phoneNo') ?? '+91 9876543210';
       email = prefs.getString('email') ?? 'email@email.com';
     });
-    final userid = prefs.getString("userId");
-    debugPrint('user id is $userid');
+
+    // Then try to fetch from Firestore
+    try {
+      final userVM = Provider.of<RegisterUserViewModel>(context, listen: false);
+      await userVM.fetchCurrentUser();
+
+      if (userVM.user != null) {
+        setState(() {
+          fullName = userVM.user!.fullName;
+          phoneNo = userVM.user!.phoneNo;
+          email = userVM.user!.email;
+          aadhaarNo = userVM.user!.aadhaarNo;
+        });
+
+        // Update SharedPreferences with fresh data
+        await prefs.setString('fullName', fullName);
+        await prefs.setString('phoneNo', phoneNo);
+        await prefs.setString('email', email);
+      }
+    } catch (e) {
+      debugPrint('Error fetching user data: $e');
+      // If Firestore fetch fails, we'll use the SharedPreferences data
+    }
   }
 
   @override
@@ -105,7 +129,9 @@ class _ProfileViewState extends State<ProfileView> {
                           label: AppLocalizations.of(
                             context,
                           )!.translate('aadhar_no'),
-                          value: "xxxxxxxxxx",
+                          value: aadhaarNo.isNotEmpty
+                              ? _maskAadhaar(aadhaarNo)
+                              : "xxxxxxxxxx",
                         ),
                       ],
                     ),
@@ -115,22 +141,37 @@ class _ProfileViewState extends State<ProfileView> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-  AppLocalizations.of(context)!.translate('badges_earned'),
-  style: TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: colorScheme.secondary,
-  ),
-),
+                    AppLocalizations.of(context)!.translate('badges_earned'),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.secondary,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 16,
                   runSpacing: 16,
                   children: [
-                   _buildBadge(Icons.emoji_events, AppLocalizations.of(context)!.translate('top_reporter'), Colors.amber),
-_buildBadge(Icons.star, AppLocalizations.of(context)!.translate('x_complaints', ['5']), Colors.blue),
-_buildBadge(Icons.verified, AppLocalizations.of(context)!.translate('verified_user'), Colors.green),],
+                    _buildBadge(
+                      Icons.emoji_events,
+                      AppLocalizations.of(context)!.translate('top_reporter'),
+                      Colors.amber,
+                    ),
+                    _buildBadge(
+                      Icons.star,
+                      AppLocalizations.of(
+                        context,
+                      )!.translate('x_complaints', ['5']),
+                      Colors.blue,
+                    ),
+                    _buildBadge(
+                      Icons.verified,
+                      AppLocalizations.of(context)!.translate('verified_user'),
+                      Colors.green,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
@@ -145,7 +186,9 @@ _buildBadge(Icons.verified, AppLocalizations.of(context)!.translate('verified_us
                       if (mounted) setState(() {});
                     },
                     icon: const Icon(Icons.logout_outlined),
-                    label:  Text(AppLocalizations.of(context)!.translate('logout')),
+                    label: Text(
+                      AppLocalizations.of(context)!.translate('logout'),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                       foregroundColor: Colors.white,
@@ -163,6 +206,11 @@ _buildBadge(Icons.verified, AppLocalizations.of(context)!.translate('verified_us
         ),
       ),
     );
+  }
+
+  String _maskAadhaar(String aadhaar) {
+    if (aadhaar.length <= 4) return aadhaar;
+    return '${'x' * (aadhaar.length - 4)}${aadhaar.substring(aadhaar.length - 4)}';
   }
 
   Widget _buildBadge(IconData icon, String label, Color color) {
@@ -189,12 +237,15 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-        const Spacer(),
-        Text(value, style: const TextStyle(color: Colors.grey)),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+          const Spacer(),
+          Text(value, style: const TextStyle(color: Colors.grey)),
+        ],
+      ),
     );
   }
 }
