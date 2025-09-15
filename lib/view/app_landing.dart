@@ -1,7 +1,8 @@
-import 'package:civic_service_app/view/complaint_views/add_complaint_view.dart';
-import 'package:civic_service_app/view/complaint_views/complaint_status_view.dart';
+import 'package:civic_service_app/view/complaint_views/add_complaint_landing.dart';
+import 'package:civic_service_app/view/complaint_views/track_complaint.dart';
 import 'package:civic_service_app/view/emergency_numbers_views/emergency_numbers_view.dart';
 import 'package:civic_service_app/view/home_views/home_view.dart';
+import 'package:civic_service_app/view/profile_page_views/profile_landing.dart';
 import 'package:civic_service_app/view/profile_page_views/profile_view.dart';
 import 'package:flutter/material.dart';
 
@@ -17,10 +18,10 @@ class _AppLandingState extends State<AppLanding> {
 
   final List<Widget> _pages = [
     HomeView(),
-    ComplaintStatusView(),
-    AddComplaintView(),
+    ComplaintStatusWrapper(),
+    AddComplaintWrapper(),
     EmergencyNumbersView(),
-    ProfileView(),
+    ProfileWrapper(),
   ];
 
   void _onItemTapped(int index) {
@@ -69,7 +70,7 @@ class _AppLandingState extends State<AppLanding> {
                 activeColor,
                 inactiveColor,
               ),
-              const SizedBox(width: 64), 
+              const SizedBox(width: 64),
               _buildNavItem(Icons.call, "Calls", 3, activeColor, inactiveColor),
               _buildNavItem(
                 Icons.person_2_outlined,

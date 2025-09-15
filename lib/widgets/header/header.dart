@@ -21,15 +21,7 @@ class Header extends StatelessWidget {
         Spacer(),
         HeaderButtons(icon: Icons.translate_rounded),
         HeaderButtons(icon: Icons.notifications_none),
-        HeaderButtons(
-          toPage: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AuthenticationLanding()),
-            );
-          },
-          icon: Icons.person_2_outlined,
-        ),
+        HeaderButtons(icon: Icons.chat_bubble_outline),
         SizedBox(width: 6),
       ],
     );

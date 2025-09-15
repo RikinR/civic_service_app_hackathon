@@ -1,9 +1,13 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:civic_service_app/core/theme.dart';
 import 'package:civic_service_app/view/app_landing.dart';
+import 'package:civic_service_app/viewmodel/auth_view_model.dart';
+import 'package:civic_service_app/viewmodel/complaint_viewmodel.dart';
+import 'package:civic_service_app/viewmodel/user_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:safesecurelibs/safesecurelibs.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
@@ -11,12 +15,25 @@ import 'package:flutter/services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  
 
   runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const AppLanding(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthViewModel()),
+        ChangeNotifierProvider(create: (context) => RegisterUserViewModel()),
+        ChangeNotifierProvider(create: (context) => ComplaintViewModel()),
+      ],
+      // child: MaterialApp(
+      //   debugShowCheckedModeBanner: false,
+      //   theme: AppTheme.lightTheme,
+      //   home: const SecurityCheckPage(),
+      // ),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const AppLanding(),
+      ),
     ),
   );
 }

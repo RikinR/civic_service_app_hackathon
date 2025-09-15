@@ -1,7 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:civic_service_app/view/app_landing.dart';
+import 'package:civic_service_app/viewmodel/user_viewmodel.dart';
 import 'package:civic_service_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterUser extends StatefulWidget {
   const RegisterUser({super.key});
@@ -11,28 +15,30 @@ class RegisterUser extends StatefulWidget {
 }
 
 class _RegisterUserState extends State<RegisterUser> {
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController dobController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController aadharController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController aadhaarController = TextEditingController();
 
-  DateTime? selectedDate;
+  String? userId; 
+  String? emailId;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        dobController.text =
-            "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('userId');
+      emailId = prefs.getString('emailID');
+
+      if (emailId != null) {
+        emailController.text = emailId!;
+      }
+    });
   }
 
   @override
@@ -65,98 +71,104 @@ class _RegisterUserState extends State<RegisterUser> {
               width: width * 0.9,
               padding: const EdgeInsets.all(16),
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Register User",
-                      style: TextStyle(
-                        color: colorScheme.tertiary,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    TextFormField(
-                      controller: firstNameController,
-                      decoration: InputDecoration(
-                        labelText: 'First Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                child: Consumer<RegisterUserViewModel>(
+                  builder: (context, vm, child) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Register User",
+                          style: TextStyle(
+                            color: colorScheme.tertiary,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
+                        const SizedBox(height: 20),
 
-                    TextFormField(
-                      controller: lastNameController,
-                      decoration: InputDecoration(
-                        labelText: 'Last Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                        TextFormField(
+                          controller: fullNameController,
+                          decoration: InputDecoration(
+                            labelText: 'Full Name',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
-                    TextFormField(
-                      controller: dobController,
-                      readOnly: true,
-                      onTap: () => _selectDate(context),
-                      decoration: InputDecoration(
-                        labelText: 'Date of Birth',
-                        suffixIcon: Icon(Icons.calendar_today),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                        TextFormField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          enabled:
+                              userId == null, 
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
 
-                    TextFormField(
-                      controller: locationController,
-                      decoration: InputDecoration(
-                        labelText: 'Location',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+                        const SizedBox(height: 15),
+
+                        TextFormField(
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            labelText: 'Phone Number',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
-                    TextFormField(
-                      controller: aadharController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(12),
+                        TextFormField(
+                          controller: aadhaarController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Aadhaar Number',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+
+                        vm.isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : CustomButton(
+                                function: () async {
+                                  await vm.registerUser(
+                                    uid:
+                                        userId!, 
+                                    fullName: fullNameController.text.trim(),
+                                    email: emailController.text.trim(),
+                                    phoneNo: phoneController.text.trim(),
+                                    aadhaarNo: aadhaarController.text.trim(),
+                                    context: context,
+                                  );
+
+                                  if (vm.error == null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const AppLanding(),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(vm.error!)),
+                                    );
+                                  }
+                                },
+                                label: 'Submit',
+                              ),
                       ],
-                      decoration: InputDecoration(
-                        labelText: 'Aadhaar Number',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-
-                    CustomButton(
-                      function: () {
-                        debugPrint("User Registered:");
-                        debugPrint("First Name: ${firstNameController.text}");
-                        debugPrint("Last Name: ${lastNameController.text}");
-                        debugPrint("DOB: ${dobController.text}");
-                        debugPrint("Location: ${locationController.text}");
-                        debugPrint("Aadhaar: ${aadharController.text}");
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => AppLanding()),
-                        );
-                      },
-                      label: 'Submit',
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ),

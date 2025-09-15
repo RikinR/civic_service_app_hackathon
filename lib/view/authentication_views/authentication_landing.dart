@@ -1,19 +1,50 @@
-
-import 'package:civic_service_app/view/authentication_views/verify_otp.dart';
+import 'package:civic_service_app/view/profile_page_views/profile_view.dart';
+import 'package:civic_service_app/viewmodel/auth_view_model.dart';
 import 'package:civic_service_app/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class AuthenticationLanding extends StatelessWidget {
+class AuthenticationLanding extends StatefulWidget {
   const AuthenticationLanding({super.key});
 
   @override
+  State<AuthenticationLanding> createState() => _AuthenticationLandingState();
+}
+
+class _AuthenticationLandingState extends State<AuthenticationLanding> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool _isLoggedIn = false;
+  bool _checkingLogin = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      _isLoggedIn = user != null;
+      _checkingLogin = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_checkingLogin) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_isLoggedIn) {
+      return const ProfileView();
+    }
+
     final colorScheme = Theme.of(context).colorScheme;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final TextEditingController phoneNumberController = TextEditingController();
-    final FocusNode phoneFocusNode = FocusNode();
 
     return Scaffold(
       body: Container(
@@ -35,74 +66,86 @@ class AuthenticationLanding extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              height: height * 0.3,
+              height: height * 0.45,
               width: width * 0.9,
-              child: Column(
-                children: [
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: colorScheme.tertiary,
-                        ),
-                      ),
-                      Text(
-                        "Sign Up",
-                        style: TextStyle(
-                          color: colorScheme.tertiary,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Expanded(
-                      child: TextFormField(
-                        controller: phoneNumberController,
-                        focusNode: phoneFocusNode,
-                        keyboardType: TextInputType.phone,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(15),
-                        ],
-                        decoration: InputDecoration(
-                          prefix: Text('+91-'),
-                          labelText: 'Phone Number',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter phone number';
-                          }
-                          if (value.length < 10) {
-                            return 'Phone number must be at least 10 digits';
-                          }
-                          return null;
-                        },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      "Sign Up / Login",
+                      style: TextStyle(
+                        color: colorScheme.tertiary,
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 30),
-                  CustomButton(
-                    function: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => VerifyOtp()),
-                      );
-                    },
-                    label: 'Verify Phone Number',
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    Consumer<AuthViewModel>(
+                      builder: (context, authVM, child) {
+                        return Column(
+                          children: [
+                            CustomButton(
+                              function: () {
+                                authVM.registerWithEmail(
+                                  emailController.text.trim(),
+                                  passwordController.text.trim(),
+                                  context,
+                                );
+                              },
+                              label: authVM.isLoading
+                                  ? "Processing..."
+                                  : "Register",
+                            ),
+                            const SizedBox(height: 10),
+                            CustomButton(
+                              function: () {
+                                authVM
+                                    .loginWithEmail(
+                                      emailController.text.trim(),
+                                      passwordController.text.trim(),
+                                      context,
+                                    )
+                                    .then((_) {
+                                      if (!mounted) return; // ✅ Prevent crash
+                                      setState(() {
+                                        _isLoggedIn =
+                                            FirebaseAuth.instance.currentUser !=
+                                            null;
+                                      });
+                                    });
+                              },
+                              label: authVM.isLoading ? "Checking..." : "Login",
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
