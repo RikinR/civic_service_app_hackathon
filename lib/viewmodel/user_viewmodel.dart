@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, unused_field
+
 import 'package:civic_service_app/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -76,10 +78,10 @@ class RegisterUserViewModel with ChangeNotifier {
 
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? user_id = prefs.getString('userId');
-      debugPrint("fetching user from $user_id");
+      String? userId = prefs.getString('userId');
+      debugPrint("fetching user from $userId");
 
-      final doc = await _firestore.collection("user_master").doc(user_id).get();
+      final doc = await _firestore.collection("user_master").doc(userId).get();
 
       if (doc.exists) {
         _user = UserModel.fromMap(doc.id, doc.data()!);

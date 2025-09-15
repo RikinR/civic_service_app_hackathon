@@ -54,7 +54,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
             ),
           Expanded(
             child: InAppWebView(
-              initialUrlRequest: URLRequest(url: widget.url as WebUri),
+              initialUrlRequest: URLRequest(url: WebUri(widget.url)),
               onWebViewCreated: (controller) {
                 _webViewController = controller;
               },
@@ -85,16 +85,12 @@ class _WebViewScreenState extends State<WebViewScreen> {
                   ),
                 );
               },
-              initialOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(
-                  javaScriptEnabled: true,
-                  useShouldOverrideUrlLoading: true,
-                  mediaPlaybackRequiresUserGesture: false,
-                  allowFileAccessFromFileURLs: true,
-                  allowUniversalAccessFromFileURLs: true,
-                ),
-                android: AndroidInAppWebViewOptions(useHybridComposition: true),
-                ios: IOSInAppWebViewOptions(allowsInlineMediaPlayback: true),
+              initialSettings: InAppWebViewSettings(
+                javaScriptEnabled: true,
+                useShouldOverrideUrlLoading: true,
+                mediaPlaybackRequiresUserGesture: false,
+                allowFileAccessFromFileURLs: true,
+                allowUniversalAccessFromFileURLs: true,
               ),
               shouldOverrideUrlLoading: (controller, navigationAction) async {
                 final uri = navigationAction.request.url;

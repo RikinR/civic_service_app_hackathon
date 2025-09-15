@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:civic_service_app/l10n/app_localizations.dart';
 import 'package:civic_service_app/viewmodel/auth_view_model.dart';
 import 'package:civic_service_app/viewmodel/user_viewmodel.dart'; // Import the user viewmodel
