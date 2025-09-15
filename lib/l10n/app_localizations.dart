@@ -97,6 +97,7 @@ class AppLocalizations {
       'exit': 'Exit',
       'checking_security': 'Checking security...',
       'app_title': 'Civic Service App',
+      'government_of_india': 'Government Of India',
     },
     'hi': {
       // App Landing
@@ -179,6 +180,7 @@ class AppLocalizations {
       'exit': 'बाहर निकलें',
       'checking_security': 'सुरक्षा जाँच की जा रही है...',
       'app_title': 'नागरिक सेवा ऐप',
+      'government_of_india': 'भारत सरकार',
     },
     'bn': {
       // App Landing
@@ -262,6 +264,7 @@ class AppLocalizations {
       'exit': 'প্রস্থান',
       'checking_security': 'সুরক্ষা পরীক্ষা করা হচ্ছে...',
       'app_title': 'সিভিক সার্ভিস অ্যাপ',
+      'government_of_india': 'ভারত সরকার',
     },
   };
 

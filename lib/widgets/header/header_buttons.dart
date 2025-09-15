@@ -9,16 +9,7 @@ class HeaderButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: GestureDetector(
-        onTap: toPage,
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black),
-          ),
-          child: CircleAvatar(child: Icon(icon, size: 30)),
-        ),
-      ),
+      child: GestureDetector(onTap: toPage, child: Icon(icon, size: 25)),
     );
   }
 }

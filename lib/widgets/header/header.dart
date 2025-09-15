@@ -1,3 +1,4 @@
+import 'package:civic_service_app/view/chatbot_view/chat_bot_view.dart';
 import 'package:civic_service_app/widgets/header/header_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
-    
+
     return Row(
       children: [
         Padding(
@@ -18,7 +19,9 @@ class Header extends StatelessWidget {
           child: Row(
             children: [
               Image.asset('assets/govt_logo.png', height: 50),
-              Text(AppLocalizations.of(context)!.translate('government_of_india')),
+              Text(
+                AppLocalizations.of(context)!.translate('government_of_india'),
+              ),
             ],
           ),
         ),
@@ -44,9 +47,16 @@ class Header extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(width: 8),
-        HeaderButtons(icon: Icons.notifications_none),
-        HeaderButtons(icon: Icons.chat_bubble_outline),
+
+        HeaderButtons(
+          icon: Icons.chat_bubble_outline,
+          toPage: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChatBotView()),
+            );
+          },
+        ),
         const SizedBox(width: 6),
       ],
     );
