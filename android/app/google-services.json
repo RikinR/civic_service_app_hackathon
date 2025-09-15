@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325818348088",
+    "project_id": "sihtest-5732c",
+    "storage_bucket": "sihtest-5732c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325818348088:android:44a283ad809a8ee004eccd",
+        "android_client_info": {
+          "package_name": "com.example.civic_service_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA9UtojtoBv-8ycbnm7N93v7mlwvT7pLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
