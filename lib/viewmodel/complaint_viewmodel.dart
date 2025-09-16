@@ -41,6 +41,10 @@ class ComplaintViewModel with ChangeNotifier {
     return const Uuid().v4();
   }
 
+  String _generateIssueId() {
+    return const Uuid().v6();
+  }
+
   // Your upload function with minor improvements
   Future<String?> _uploadFileToS3(File file, String presignedUrl) async {
     try {
@@ -166,6 +170,7 @@ class ComplaintViewModel with ChangeNotifier {
       }
 
       String complaintId = _generateComplaintId();
+      String issueId = _generateIssueId();
 
       // Upload image if provided
       String? imageUrl;
@@ -217,14 +222,39 @@ class ComplaintViewModel with ChangeNotifier {
         'imageUrl': imageUrl,
         'voiceUrl': voiceUrl,
         'status': 'Submitted',
-        'transcribe':'',
-        'translate':''
+        'transcribe': '',
+        'translate': '',
+        'dept_id': '',
+      };
+
+      Map<String, dynamic> issueData = {
+        'complaintId': complaintId,
+        'createdAt': FieldValue.serverTimestamp(),
+        'description': description,
+        'latitude': location.latitude,
+        'longitude': location.longitude,
+        'userId': userId,
+        'imageUrl': imageUrl,
+        'voiceUrl': voiceUrl,
+        'status': 'Submitted',
+        'transcribe': '',
+        'translate': '',
+        'dept_id': '',
+        'issue_id': issueId,
       };
 
       await _firestore
           .collection('complaint_master')
           .doc(complaintId)
           .set(complaintData);
+
+      await _firestore
+          .collection('issue_master_tmp')
+          .doc(issueId)
+          .set(issueData);
+
+      // After successfully adding complaint to Firestore
+      await prefs.setString('latestComplaintId', complaintId);
 
       _setLoading(false);
     } catch (e) {
@@ -257,6 +287,49 @@ class ComplaintViewModel with ChangeNotifier {
       _complaints = snapshot.docs
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
+
+      _setLoading(false);
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to fetch complaints: $e');
+      _setLoading(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchLatestComplaints() async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+      String? latestComplaintId = prefs.getString('latestComplaintId');
+      debugPrint("getting latest complaint for user $userId");
+
+      if (userId == null) {
+        _setError('User ID not found in SharedPreferences');
+        _setLoading(false);
+        return;
+      }
+
+      if (latestComplaintId == null) {
+        _setError('No latest complaint ID found in SharedPreferences');
+        _setLoading(false);
+        return;
+      }
+
+      // Fetch that specific complaint by ID
+      DocumentSnapshot doc = await _firestore
+          .collection('complaint_master')
+          .doc(latestComplaintId)
+          .get();
+
+      if (doc.exists) {
+        _complaints = [doc.data() as Map<String, dynamic>];
+      } else {
+        _complaints = []; // No complaint found
+      }
 
       _setLoading(false);
       notifyListeners();

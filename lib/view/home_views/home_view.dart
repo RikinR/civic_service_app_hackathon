@@ -1,9 +1,12 @@
 import 'package:civic_service_app/view/scheme_views/scheme_view.dart';
+import 'package:civic_service_app/viewmodel/complaint_viewmodel.dart';
 import 'package:civic_service_app/widgets/header/header.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:civic_service_app/l10n/app_localizations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart'; // Add this import
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -14,28 +17,30 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final _carouselController = CarouselSliderController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   int _currentIndex = 0;
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
 
   // Local image assets list with corresponding URLs
   final List<Map<String, String>> _imageAssets = [
     {
       'asset': 'assets/schemes/IMG-20250915-WA0090.jpg',
-      'url':
-          'https://www.myscheme.gov.in/schemes/mgnrega', // Replace with actual URL
+      'url': 'https://www.myscheme.gov.in/schemes/mgnrega',
     },
     {
       'asset': 'assets/schemes/IMG-20250915-WA0091.jpg',
       'url':
-          'https://schemes.vikaspedia.in/viewcontent/schemesall/schemes-for-farmers/pradhan-mantri-kisan-samman-nidhi?lgn=en', // Replace with actual URL
+          'https://schemes.vikaspedia.in/viewcontent/schemesall/schemes-for-farmers/pradhan-mantri-kisan-samman-nidhi?lgn=en',
     },
     {
       'asset': 'assets/schemes/IMG-20250915-WA0092.jpg',
-      'url':
-          'https://www.nic.gov.in/project/pm-kisan/', // Replace with actual URL
+      'url': 'https://www.nic.gov.in/project/pm-kisan/',
     },
     {
       'asset': 'assets/schemes/IMG-20250915-WA0093.jpg',
-      'url': 'https://abdm.gov.in/', // Replace with actual URL
+      'url': 'https://abdm.gov.in/',
     },
   ];
 
@@ -44,37 +49,36 @@ class _HomeViewState extends State<HomeView> {
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0084.jpg',
       'url':
-          'https://www.myscheme.gov.in/search/category/Banking,Financial%20Services%20and%20Insurance', // Replace with actual URL
+          'https://www.myscheme.gov.in/search/category/Banking,Financial%20Services%20and%20Insurance',
     },
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0085.jpg',
       'url':
-          'https://www.myscheme.gov.in/search/category/Health%20&%20Wellness', // Replace with actual URL
+          'https://www.myscheme.gov.in/search/category/Health%20&%20Wellness',
     },
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0086.jpg',
       'url':
-          'https://www.myscheme.gov.in/search/category/Agriculture,Rural%20&%20Environment', // Replace with actual URL
+          'https://www.myscheme.gov.in/search/category/Agriculture,Rural%20&%20Environment',
     },
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0087.jpg',
       'url':
-          'https://www.myscheme.gov.in/search/category/Science,%20IT%20&%20Communications', // Replace with actual URL
+          'https://www.myscheme.gov.in/search/category/Science,%20IT%20&%20Communications',
     },
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0088.jpg',
       'url':
-          'https://www.myscheme.gov.in/search/category/Skills%20&%20Employment', // Replace with actual URL
+          'https://www.myscheme.gov.in/search/category/Skills%20&%20Employment',
     },
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0089.jpg',
-      'url':
-          'https://www.myscheme.gov.in/search/category/Travel%20&%20Tourism', // Replace with actual URL
+      'url': 'https://www.myscheme.gov.in/search/category/Travel%20&%20Tourism',
     },
     {
       'asset': 'assets/mini_schemes/IMG-20250915-WA0005.jpg',
       'url':
-          'https://www.myscheme.gov.in/search/category/Housing%20&%20Shelter', // Replace with actual URL
+          'https://www.myscheme.gov.in/search/category/Housing%20&%20Shelter',
     },
   ];
 
@@ -82,6 +86,7 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _autoAdvanceCarousel();
+    _checkAuthStatus();
   }
 
   void _autoAdvanceCarousel() {
@@ -93,13 +98,66 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  // Function to launch URL in default browser
+  Future<void> _checkAuthStatus() async {
+    try {
+      final user = _auth.currentUser;
+      setState(() {
+        _isLoggedIn = user != null;
+      });
 
-  // Function to open URL in embedded webvie
+      if (_isLoggedIn) {
+        // Use the ViewModel to fetch the latest complaint
+        final complaintViewModel = Provider.of<ComplaintViewModel>(
+          context,
+          listen: false,
+        );
+        await complaintViewModel.fetchLatestComplaints();
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _isLoggedIn = false;
+      });
+    }
+  }
+
+  double _getProgressPercentage(Map<String, dynamic> complaint) {
+    // Customize this based on your complaint status logic
+    final status = complaint['status']?.toString().toLowerCase() ?? '';
+
+    switch (status) {
+      case 'submitted':
+        return 0.25;
+      case 'in_progress':
+        return 0.5;
+      case 'resolved':
+        return 1.0;
+      case 'rejected':
+        return 0.0;
+      default:
+        return 0.1;
+    }
+  }
+
+  String _getStatusText(Map<String, dynamic> complaint) {
+    final status = complaint['status']?.toString() ?? 'Submitted';
+    return status;
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final complaintViewModel = Provider.of<ComplaintViewModel>(context);
+
+    // Get the latest complaint from the ViewModel
+    final latestComplaint = complaintViewModel.complaints.isNotEmpty
+        ? complaintViewModel.complaints.first
+        : null;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -160,8 +218,15 @@ class _HomeViewState extends State<HomeView> {
                   final item = _imageAssets[index];
                   return GestureDetector(
                     onTap: () {
-                      // Open in embedded webview when tapped
-                      WebViewScreen(url: item['url']!, title: 'Details');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WebViewScreen(
+                            url: item['url']!,
+                            title: 'Details',
+                          ),
+                        ),
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -221,82 +286,30 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 16),
 
+              // Complaint Status Section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(
-                            context,
-                          )!.translate('progress_for_your_last_complaint'),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        LinearPercentIndicator(
-                          lineHeight: 50.0,
-                          percent: 0.67,
-                          animation: true,
-                          animationDuration: 1200,
-                          barRadius: const Radius.circular(12),
-                          backgroundColor: Colors.grey[300]!,
-                          linearGradient: const LinearGradient(
-                            colors: [Colors.amber, Colors.yellow],
-                          ),
-                          center: Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.translate('x_completed', ['2', '3']),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildSummaryItem(
-                              AppLocalizations.of(
-                                context,
-                              )!.translate('pending'),
-                              '3',
-                              colorScheme.tertiary,
-                            ),
-                            _buildSummaryItem(
-                              AppLocalizations.of(
-                                context,
-                              )!.translate('completed'),
-                              '2',
-                              colorScheme.primary,
-                            ),
-
-                            _buildSummaryItem(
-                              AppLocalizations.of(
-                                context,
-                              )!.translate('completed'),
-                              '1',
-                              colorScheme.primary,
-                            ),
-                          ],
-                        ),
-                      ],
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: _isLoading || complaintViewModel.isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _isLoggedIn
+                          ? latestComplaint != null
+                                ? _buildComplaintProgress(
+                                    latestComplaint,
+                                    colorScheme,
+                                  )
+                                : _buildNoComplaintsPrompt(context)
+                          : _buildLoginPrompt(context),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
+
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -310,9 +323,14 @@ class _HomeViewState extends State<HomeView> {
                           final item = _horizontalImageAssets[index];
                           return GestureDetector(
                             onTap: () {
-                              WebViewScreen(
-                                url: item['url']!,
-                                title: 'Detials',
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WebViewScreen(
+                                    url: item['url']!,
+                                    title: 'Details',
+                                  ),
+                                ),
                               );
                             },
                             child: Padding(
@@ -360,6 +378,121 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
     );
+  }
+
+  Widget _buildComplaintProgress(
+    Map<String, dynamic> complaint,
+    ColorScheme colorScheme,
+  ) {
+    final progress = _getProgressPercentage(complaint);
+    final status = _getStatusText(complaint);
+    final complaintId = complaint['complaintId']?.toString() ?? 'N/A';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(
+            context,
+          )!.translate('progress_for_your_last_complaint'),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Complaint ID: $complaintId',
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+        ),
+        const SizedBox(height: 16),
+
+        LinearPercentIndicator(
+          lineHeight: 50.0,
+          percent: progress,
+          animation: true,
+          animationDuration: 1200,
+          barRadius: const Radius.circular(12),
+          backgroundColor: Colors.grey[300]!,
+          linearGradient: const LinearGradient(
+            colors: [Colors.amber, Colors.yellow],
+          ),
+          center: Text(
+            '${(progress * 100).toStringAsFixed(0)}% ${AppLocalizations.of(context)!.translate('completed')}',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+        Text(
+          'Status: ${status.toUpperCase()}',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: _getStatusColor(status, colorScheme),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoComplaintsPrompt(BuildContext context) {
+    return Column(
+      children: [
+        Icon(Icons.report_problem, size: 64, color: Colors.grey[400]),
+        const SizedBox(height: 16),
+        Text(
+          AppLocalizations.of(context)!.translate('no_complaints_found'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          AppLocalizations.of(context)!.translate('add_complaint_to_track'),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginPrompt(BuildContext context) {
+    return Column(
+      children: [
+        Icon(Icons.person_outline, size: 64, color: Colors.grey[400]),
+        const SizedBox(height: 16),
+        Text(
+          AppLocalizations.of(
+            context,
+          )!.translate('please_login_to_view_progress'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          AppLocalizations.of(context)!.translate('login_to_track_complaints'),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Color _getStatusColor(String status, ColorScheme colorScheme) {
+    switch (status.toLowerCase()) {
+      case 'submitted':
+        return Colors.blue;
+      case 'in_progress':
+        return Colors.orange;
+      case 'resolved':
+        return Colors.green;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return colorScheme.primary;
+    }
   }
 
   Widget _buildSummaryItem(String title, String value, Color color) {

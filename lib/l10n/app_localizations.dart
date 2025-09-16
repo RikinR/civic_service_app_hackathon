@@ -89,6 +89,13 @@ class AppLocalizations {
       'login': 'Login',
       'processing': 'Processing...',
       'checking': 'Checking...',
+      'no_complaints_found': 'No complaints found',
+      'add_complaint_to_track': 'Add a complaint to track its progress',
+      'add_complaint': 'Add Complaint',
+      'please_login_to_view_progress': 'Please login to view progress',
+      'login_to_track_complaints': 'Login to track your complaint status',
+      'login': 'Login',
+      'completed': 'Completed',
 
       //main
       'security_alert': 'Security Alert',
