@@ -22,10 +22,10 @@ class ComplaintViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   List<Map<String, dynamic>> get complaints => _complaints;
-  String awsAccessKey = 'AKIA37AU3X2R4WOVDZ4U';
-  String awsSecretKey = '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';
-  String region = 'ap-south-1';
-  String bucketName = 'ngbucket24';
+  String awsAccessKey = '';
+  String awsSecretKey = '';
+  String region = '';
+  String bucketName = '';
 
   void _setLoading(bool value) {
     _isLoading = value;
