@@ -12,9 +12,7 @@ import 'package:http/http.dart' as http;
 
 class ComplaintViewModel with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // String presignedURl =
-  //     'https://s3.ap-south-1.amazonaws.com/ngbucket24/path/to/file.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA37AU3X2R3LLZUK76%2F20250915%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20250915T141612Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=0c404571f7f118042e0b65058ae385e278137cb290baf61e48bca21c0fae472a';
-
+  
   bool _isLoading = false;
   String? _error;
   List<Map<String, dynamic>> _complaints = [];

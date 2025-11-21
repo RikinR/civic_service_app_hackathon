@@ -10,7 +10,7 @@ class ChatBotView extends StatefulWidget {
 
 class _ChatBotViewState extends State<ChatBotView> {
   final GeminiService geminiService = GeminiService(
-    "AIzaSyBAJbubgfm6dHQgYMRxSAMl9JfiFXrL9oY",
+    "",
   ); // 🔑 Replace with your key
   final TextEditingController _controller = TextEditingController();
 
